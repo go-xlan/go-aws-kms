@@ -33,6 +33,7 @@ func TestAwsKms_Encrypt(t *testing.T) {
 		Credentials: awskms.NewEnvCredentials(envOptions),
 		Region:      region,
 		Logger:      awskms.NewSlogLogger(),
+		LogLevel:    aws.LogLevel(aws.LogDebug),
 	})))
 	encryptKeyID := must.Nice(os.Getenv(envOptions.EncryptKeyID))
 
@@ -63,8 +64,10 @@ func TestAwsKms_Encrypts(t *testing.T) {
 
 	region := aws.String(regionString)
 	oneKms := kms.New(done.VCE(session.NewSession(&aws.Config{
-		Region:      region,
 		Credentials: credentials.NewStaticCredentials(accessString, secretString, xTokenString),
+		Region:      region,
+		Logger:      awskms.NewZapLogger(),
+		LogLevel:    aws.LogLevel(aws.LogDebug),
 	})).Nice())
 	awsKms := awskms.NewAwsKms(oneKms, encryptKeyID)
 
